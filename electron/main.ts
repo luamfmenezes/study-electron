@@ -1,38 +1,46 @@
-import { app, BrowserWindow } from 'electron'
-import * as path from 'path'
-import * as url from 'url'
-import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer'
+import { app, BrowserWindow, ipcMain } from 'electron';
+import * as path from 'path';
+import * as url from 'url';
+import fs from 'fs';
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer';
 
-let mainWindow: Electron.BrowserWindow | null
+let mainWindow: Electron.BrowserWindow | null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
-    backgroundColor: '#191622',
+    autoHideMenuBar: true,
+    transparent: true,
+    frame: false,
+    thickFrame: false,
     webPreferences: {
-      nodeIntegration: true
-    }
-  })
+      nodeIntegration: true,
+    },
+  });
 
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:4000')
+    mainWindow.loadURL('http://localhost:4000');
   } else {
     mainWindow.loadURL(
       url.format({
         pathname: path.join(__dirname, 'renderer/index.html'),
         protocol: 'file:',
-        slashes: true
+        slashes: true,
       })
-    )
+    );
   }
 
   mainWindow.on('closed', () => {
-    mainWindow = null
-  })
+    mainWindow = null;
+  });
 }
 
-app.on('ready', createWindow)
+app
+  .on('ready', createWindow)
   .whenReady()
   .then(() => {
     if (process.env.NODE_ENV === 'development') {
@@ -43,5 +51,21 @@ app.on('ready', createWindow)
         .then((name) => console.log(`Added Extension:  ${name}`))
         .catch((err) => console.log('An error occurred: ', err));
     }
-  })
-app.allowRendererProcessReuse = true
+  });
+
+app.allowRendererProcessReuse = true;
+
+ipcMain.on('asynchronous-message', (event, arg) => {
+  const filePath = process.argv[1];
+  fs.readFile(filePath, 'utf8', (err, file) => {
+    if (err) {
+      console.log(err);
+    } else {
+      event.reply('asynchronous-reply', file);
+    }
+  });
+});
+
+ipcMain.on('asynchronous-message-save', (event, arg) => {
+  console.log('saved');
+});
