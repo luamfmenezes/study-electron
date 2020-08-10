@@ -1,10 +1,10 @@
-## Electron note
+## Electron note 📝📒
 
 Simple note application created to test some electron concepts.
 
 - IPC
 - Generate .exe
-- Window costumization
+- Window customization
 - Deal with files
 
 ## Installation
