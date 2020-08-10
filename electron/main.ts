@@ -13,10 +13,11 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
-    autoHideMenuBar: true,
+    minHeight: 300,
+    minWidth: 300,
     transparent: true,
     frame: false,
-    thickFrame: false,
+    thickFrame: true,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -57,11 +58,12 @@ app.allowRendererProcessReuse = true;
 
 ipcMain.on('asynchronous-message', (event, arg) => {
   const filePath = process.argv[1];
-  fs.readFile(filePath, 'utf8', (err, file) => {
+  const title = filePath.split('\\')[filePath.split('\\').length - 1];
+  fs.readFile(filePath, 'utf8', (err, text) => {
     if (err) {
       console.log(err);
     } else {
-      event.reply('asynchronous-reply', file);
+      event.reply('asynchronous-reply', { text, title });
     }
   });
 });

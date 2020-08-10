@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View } from 'react-native';
-
+import { remote } from 'electron';
 import { Container, Title, Controllers } from './styles';
 import ActionContainer from '../ActionContainer';
 
@@ -13,8 +13,23 @@ import {
 import { IoIosArrowBack } from 'react-icons/io';
 import { AiOutlinePoweroff } from 'react-icons/ai';
 
-const Header: React.FC = () => {
+interface IProps {
+  title: string | undefined;
+}
+
+const Header: React.FC = ({ title }) => {
   const [show, setShow] = useState(false);
+
+  const handleMinimize = useCallback(() => {
+    const window = remote.getCurrentWindow();
+    window.minimize();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    const window = remote.getCurrentWindow();
+    window.close();
+  }, []);
+
   return (
     <Container>
       <ActionContainer show={show} />
@@ -25,15 +40,12 @@ const Header: React.FC = () => {
           <IoIosArrowBack color="#7159ca" size={16} />
         )}
       </button>
-      <Title>ElectroNote</Title>
+      <Title>{title || 'Electron Note'}</Title>
       <Controllers>
-        <button>
+        <button onClick={handleMinimize}>
           <FiMinus color="#7159ca" size={16} />
         </button>
-        <button>
-          <FiMaximize color="#7159ca" size={16} />
-        </button>
-        <button>
+        <button onClick={handleClose}>
           <AiOutlinePoweroff color="#7159ca" size={16} />
         </button>
       </Controllers>

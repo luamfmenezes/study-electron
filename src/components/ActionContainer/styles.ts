@@ -6,7 +6,7 @@ interface ContainerProps {
 
 export const Container = styled.div<ContainerProps>`
   position: fixed;
-  z-index: 2;
+  z-index: 1;
   background: #0d0a16;
   padding: 8px;
   border-radius: 8px;
@@ -15,7 +15,9 @@ export const Container = styled.div<ContainerProps>`
   top: 40px;
   border: 0;
   transform: ${(props) =>
-    props.show === 'true' ? 'translateX(0px)' : 'translateX(-200px)'};
+    props.show === 'true'
+      ? 'translateX(0px) scale(1)'
+      : 'translateX(-200px) scale(0)'};
   transition: 0.5s;
   button {
     border: 0;

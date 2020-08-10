@@ -10,15 +10,17 @@ mainElement.setAttribute('id', 'root');
 document.body.appendChild(mainElement);
 
 const App = () => {
-  const [data, setData] = useState('teste');
+  const [data, setData] = useState('');
+  const [title, setTitle] = useState('');
 
   useEffect(() => {
-    ipcRenderer.on('asynchronous-reply', (event, arg) => {
-      console.log(arg); // prints "pong"
-      setData(arg);
+    ipcRenderer.on('asynchronous-reply', (event, fileData) => {
+      setData(fileData.text);
+      console.log(fileData);
+      setTitle(fileData.title);
     });
     ipcRenderer.send('asynchronous-message', 'ping');
-  }, [setData]);
+  }, [setData, setTitle]);
 
   const handleSave = () => {
     ipcRenderer.send('asynchronous-message-save');
@@ -27,7 +29,7 @@ const App = () => {
   return (
     <>
       <GlobalStyle />
-      <Header />
+      <Header title={title} />
       <TextEditor value={data} onChange={setData} />
     </>
   );
