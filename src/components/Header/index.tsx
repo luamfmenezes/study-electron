@@ -15,9 +15,10 @@ import { AiOutlinePoweroff } from 'react-icons/ai';
 
 interface IProps {
   title: string | undefined;
+  handleSave: Function;
 }
 
-const Header: React.FC = ({ title }) => {
+const Header: React.FC<IProps> = ({ title, handleSave }) => {
   const [show, setShow] = useState(false);
 
   const handleMinimize = useCallback(() => {
@@ -32,7 +33,7 @@ const Header: React.FC = ({ title }) => {
 
   return (
     <Container>
-      <ActionContainer show={show} />
+      <ActionContainer show={show} handleSave={handleSave} />
       <button onClick={() => setShow((oldShow) => !oldShow)}>
         {!show ? (
           <FiMoreHorizontal color="#7159ca" size={16} />

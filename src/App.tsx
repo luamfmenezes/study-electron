@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { render } from 'react-dom';
 import { GlobalStyle } from './styles/GlobalStyle';
 import { ipcRenderer } from 'electron';
@@ -12,25 +12,33 @@ document.body.appendChild(mainElement);
 const App = () => {
   const [data, setData] = useState('');
   const [title, setTitle] = useState('');
+  const [wasEdited, setWasEdited] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.on('asynchronous-reply', (event, fileData) => {
+    ipcRenderer.on('set-file', (event, fileData) => {
       setData(fileData.text);
-      console.log(fileData);
       setTitle(fileData.title);
     });
-    ipcRenderer.send('asynchronous-message', 'ping');
+    ipcRenderer.send('get-file');
   }, [setData, setTitle]);
 
-  const handleSave = () => {
-    ipcRenderer.send('asynchronous-message-save');
-  };
+  const handleTextChange = useCallback(
+    (text: string) => {
+      setData(text);
+      setWasEdited(true);
+    },
+    [setData]
+  );
+
+  const handleSave = useCallback(() => {
+    ipcRenderer.send('save-file', data);
+  }, [data]);
 
   return (
     <>
       <GlobalStyle />
-      <Header title={title} />
-      <TextEditor value={data} onChange={setData} />
+      <Header title={title} handleSave={handleSave} />
+      <TextEditor value={data} onChange={handleTextChange} />
     </>
   );
 };

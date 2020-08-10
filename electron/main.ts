@@ -56,18 +56,29 @@ app
 
 app.allowRendererProcessReuse = true;
 
-ipcMain.on('asynchronous-message', (event, arg) => {
-  const filePath = process.argv[1];
-  const title = filePath.split('\\')[filePath.split('\\').length - 1];
+const filePath = process.argv[1];
+const title = filePath.split('\\')[filePath.split('\\').length - 1];
+
+ipcMain.on('get-file', (event, arg) => {
   fs.readFile(filePath, 'utf8', (err, text) => {
     if (err) {
       console.log(err);
     } else {
-      event.reply('asynchronous-reply', { text, title });
+      event.reply('set-file', { text, title });
     }
   });
 });
 
-ipcMain.on('asynchronous-message-save', (event, arg) => {
-  console.log('saved');
+ipcMain.on('save-file', (event, text) => {
+  fs.writeFile(filePath, text, 'utf-8', (err) => {
+    if (err) {
+      event.reply('set-file-error');
+    } else {
+      event.reply('set-file-success');
+    }
+  });
+});
+
+ipcMain.on('new-window', () => {
+  createWindow();
 });
